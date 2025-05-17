@@ -30,14 +30,14 @@ export class TodosController {
     }
 
     public createTodo = (req: Request, res: Response) =>{
-        const {text}= req.body;
+        const {title}= req.body;
 
-        if(!text){
-            return res.status(400).json({message:'Text is required'});
+        if(!title){
+            return res.status(400).json({message:'Title is required'});
         }
         const newTodo = {
             id: todos.length + 1,
-            title: text,
+            title: title,
             createdAt: new Date(),
             completed: false
         };
@@ -52,13 +52,13 @@ export class TodosController {
             return res.status(400).json({ message: 'Id is not a number' });
         }
 
-        const { text, completed, createdAt } = req.body;
+        const { title, completed, createdAt } = req.body;
  
         const todo = todos.find(todo => todo.id === parseInt(id));
         if (!todo) {
             return res.status(404).json({ message: 'Todo not found' });
         }
-        todo.title = text || todo.title;
+        todo.title = title || todo.title;
         todo.completed = completed || todo.completed;
         todo.createdAt = new Date(createdAt || todo.createdAt);
 
