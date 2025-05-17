@@ -4,7 +4,6 @@ import { TodoRoutes } from "./todos/routes";
 
 export class AppRoutes {
     private routes: string[] = [];
-    
 
     static get routes():Router{
         const router = Router();
