@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { prisma } from '../../data/postgres';
-import { CreateTodoDto } from '../../domain/dtos';
+import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos';
 
 
 export class TodosController {
@@ -51,7 +51,8 @@ export class TodosController {
             return res.status(400).json({ message: 'Id is not a number' });
         }
 
-        const { title, completed, createdAt } = req.body;
+        const [error, updateTodoDto] = UpdateTodoDto.create(req.body);
+        if (error) return res.status(400).json({ message: error });
         
         const todo = await prisma.todo.findUnique({
             where: {
@@ -66,14 +67,10 @@ export class TodosController {
             where: {
                 id: parseInt(id)
             },
-            data: {
-                title: title || todo.title,
-                completed: completed || todo.completed,
-                createdAt: new Date(createdAt || todo.createdAt)
-            }
+            data: updateTodoDto!.values
         });
 
-        return res.json(todo);
+        return res.json(updatedTodo);
     }
 
     public deleteTodo = async (req: Request, res: Response) =>{
