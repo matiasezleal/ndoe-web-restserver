@@ -3,8 +3,7 @@ import { TodosController } from "./controller";
 
 export class TodoRoutes {
     private routes: string[] = [];
-    
-    
+
 
     static get routes():Router{
         const router = Router();
