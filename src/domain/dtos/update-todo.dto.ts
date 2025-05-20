@@ -1,5 +1,6 @@
 export class UpdateTodoDto {
     constructor(
+        public readonly id: number,
         public readonly title?: string,
         public readonly completed?: boolean,
     ){}
@@ -7,6 +8,7 @@ export class UpdateTodoDto {
     get values(){
         const returnObj: {[key: string]: any} = {};
 
+        if(this.id !== undefined) returnObj.id = this.id;
         if(this.title !== undefined) returnObj.title = this.title;
         if(this.completed !== undefined) returnObj.completed = this.completed;
 
