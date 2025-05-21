@@ -65,11 +65,9 @@ export class TodosController {
             return res.status(400).json({ message: 'Id is not a number' });
         }
         
-        try {
-            await this.todoRepository.deleteById(parseInt(id));
-            return res.status(204).json();
-        } catch (error) {
-            return res.status(404).json({ error: error });
-        }
+        new DeleteTodoUseCaseImpl(this.todoRepository)
+        .execute(parseInt(id))
+        .then(() => res.status(204).json())
+        .catch(error => res.status(400).json({error}));
     }
 }
