@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
+import { prisma } from '../../data/postgres';
 import { CreateTodoDto, UpdateTodoDto } from '../../domain/dtos';
-import { TodoRepository
-    ,CreateTodoUseCaseImpl, DeleteTodoUseCaseImpl,
-     GetAllTodoUseCaseImpl, GetTodoUseCaseImpl, 
-     UpdateTodoUseCaseImpl  } from '../../domain';
+import { TodoRepository } from '../../domain';
+
 
 export class TodosController {
 
@@ -13,11 +12,8 @@ export class TodosController {
     ){}
 
     public getTodos = async (req: Request, res: Response) => {
-        new GetAllTodoUseCaseImpl(this.todoRepository)
-        .execute()
-        .then(todos => res.json(todos))
-        .catch(error => res.status(400).json({error}));
-        
+        const todosList = await this.todoRepository.getAll();
+        return res.json(todosList);
     }
 
     public getTodoById = async (req: Request, res: Response) => {
@@ -26,10 +22,12 @@ export class TodosController {
             return res.status(400).json({ message: 'Id is not a number' });
         }
         
-        new GetTodoUseCaseImpl(this.todoRepository)
-        .execute(parseInt(id))
-        .then(todo => res.json(todo))
-        .catch(error => res.status(400).json({error}));
+        try {
+            const todo = await this.todoRepository.getById(parseInt(id));
+            return res.json(todo);
+        } catch (error) {
+            return res.status(404).json({ error: error });
+        }
     }
 
     public createTodo = async (req: Request, res: Response) =>{
@@ -37,10 +35,9 @@ export class TodosController {
 
         if(error) return res.status(400).json({message:error});
 
-        new CreateTodoUseCaseImpl(this.todoRepository)
-        .execute(createTodoDto!)
-        .then(todo => res.status(201).json(todo))
-        .catch(error => res.status(400).json({error}));
+        const newTodo = await this.todoRepository.create(createTodoDto!);
+
+        return res.status(201).json(newTodo);
     }
 
     public updateTodo = async(req: Request, res: Response) => {
@@ -53,10 +50,12 @@ export class TodosController {
         const [error, updateTodoDto] = UpdateTodoDto.create(req.body);
         if (error) return res.status(400).json({ message: error });
         
-        new UpdateTodoUseCaseImpl(this.todoRepository)
-        .execute(updateTodoDto!)
-        .then(todo => res.json(todo))
-        .catch(error => res.status(400).json({error}));
+        try {
+            const updatedTodo = await this.todoRepository.updateById(updateTodoDto!);
+            return res.json(updatedTodo);
+        } catch (error) {
+            return res.status(404).json({ error: error });
+        }
     }
 
     public deleteTodo = async (req: Request, res: Response) =>{
