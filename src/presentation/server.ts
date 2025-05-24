@@ -10,7 +10,7 @@ interface Options {
 
 export class Server {
 
-  private app = express();
+  private readonly app = express();
   private readonly port: number;
   private readonly publicPath: string;
   private readonly router: Router;
@@ -20,6 +20,11 @@ export class Server {
     this.port = port;
     this.publicPath = public_path;
     this.router = options.router;
+  }
+
+  // Public getter for testing purposes
+  public getApp() {
+    return this.app;
   }
 
   
